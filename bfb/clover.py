@@ -1,11 +1,35 @@
+def get_all_orders(day):
+    order_limit = 1000
+    recent_response = get_orders(limit = order_limit)
+    out = recent_response
+    index = 1
+
+    while len(recent_response) == order_limit:
+        recent_response = get_orders(
+            limit = order_limit,
+            offset = index * order_limit
+        )
+        out = out + recent_response
+        # Implement this! Limits load on clover API, fixes OOM issue.
+        # earliest = min(map(lambda xx: xx['createdTime'], out))
+        index = index + 1
+    
+    return out
+
+def get_orders(limit=1000, offset=0):
+    api_fmt = ("https://api.clover.com/v3/merchants/39ZFSZEVX96EG/orders/"
+               "?offset={offset}&limit={limit}&expand=lineItems"
+               "&access_token={token}")
+    api_call = api_fmt.format(token=token, limit=limit, offset=offset)
+    response = requests.get(api_call)
+    return(json.loads(response.text)['elements'])
+
+#------ARCHIVE----------------------#
 from datetime import datetime as dt
 from pytz import timezone
 import itertools
 import requests
 import json
-
-with open('../auth/token.txt') as oo:
-    token = oo.next().strip()
 
 def get_line_items(line_item_ids):
     return map(get_line_item, line_item_ids)
@@ -114,7 +138,7 @@ def get_all_orders():
     return out
 
 def get_orders(limit=100, offset=0):
-    api_fmt = ("https://api.clover.com/v3/merchants/MERCHANTID/orders/"
+    api_fmt = ("https://api.clover.com/v3/merchants/39ZFSZEVX96EG/orders/"
                "?offset={offset}&limit={limit}&expand=lineItems"
                "&access_token={token}")
     api_call = api_fmt.format(token=token, limit=limit, offset=offset)
