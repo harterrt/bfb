@@ -76,7 +76,7 @@ class Clover(object):
             })
         )
         
-        print("Line items found: " + str(len(out)))
+        print("Line items found: " + str(out.len()))
 
         return out
 
