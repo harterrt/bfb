@@ -1,3 +1,4 @@
+import time
 from pytz import timezone
 import string
 import json
@@ -96,12 +97,13 @@ class Clover(object):
 
         # Poll clover with exponential backoff
         no_response = True
-        while self.attempts <= 10 && no_response:
+        while self.attempts <= 10 and no_response:
+            time.sleep((1.25 ** self.attempts))
             response = requests.get(url)
 
             if response.status_code == 429:
-                time.sleep((2 ** attempts))
-                attempts = attempts + 1
+                self.attempts += 1
+                print("Increased polling break coeff to " + str(self.attempts))
             else:
                 no_response = False
 
