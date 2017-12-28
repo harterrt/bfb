@@ -98,7 +98,7 @@ class Clover(object):
         # Poll clover with exponential backoff
         no_response = True
         while self.attempts <= 10 and no_response:
-            time.sleep((1.25 ** self.attempts))
+            time.sleep(1.25 ** self.attempts - 1)
             response = requests.get(url)
 
             if response.status_code == 429:
