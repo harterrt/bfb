@@ -24,6 +24,7 @@ class Clover(object):
             'merchant_id': merchant_id,
             'access_token': access_token,
         }
+        self.attempts = 0
 
     @classmethod
     def from_config(cls, config):
@@ -93,7 +94,17 @@ class Clover(object):
             .format(**line_item_id)
         )
 
-        response = requests.get(url)
+        # Poll clover with exponential backoff
+        no_response = True
+        while self.attempts <= 10 && no_response:
+            response = requests.get(url)
+
+            if response.status_code == 429:
+                time.sleep((2 ** attempts))
+                attempts = attempts + 1
+            else:
+                no_response = False
+
         return(json.loads(response.text))
 
 def clean_line_item(line_item):
