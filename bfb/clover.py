@@ -64,7 +64,7 @@ class Clover(object):
     def get_line_item_ids(self, day):
         orders = seq(self.get_all_orders(day))
 
-        return (
+        out = (
             orders
             # Filter to closed orders since open orders can have no line items
             .filter(lambda x: x['state'] == u'locked')
@@ -75,6 +75,10 @@ class Clover(object):
                 'order_id': x['orderRef']['id']
             })
         )
+        
+        print("Line items found: " + str(len(out)))
+
+        return out
 
     def get_all_line_items(self, day):
         return (
