@@ -6,6 +6,7 @@ import datetime
 from .config import default_path as default_config
 from .config import Config
 from .clover import Clover
+from .reports import summarize_month
 
 pass_config = click.make_pass_decorator(Config, ensure=True) 
 
@@ -23,6 +24,23 @@ def pull_day(config, date):
     items = clover.get_all_line_items(pydate)
 
     dicts_to_csv(items, os.path.expanduser('~/data/bfb/' + date + '.csv'))
+
+@cli.command()
+@pass_config
+@click.argument('date')
+def month_report(config, date):
+    pydate = datetime.datetime.strptime(date, '%Y-%m-%d')
+    table = summarize_month(pydate, config.contents['data_path'])
+
+    table.to_csv(os.path.join(
+        config.contents['report_path'],
+        (
+            pydate.strftime('Month=%Y%m_') +
+            datetime.date.today().strftime('Generated=%Y%m%d') +
+            '.csv'
+        )
+    ), header=True)
+
 
 def dicts_to_csv(dicts, outpath):
     headers = sorted(list(set(
