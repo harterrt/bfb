@@ -69,7 +69,7 @@ class Clover(object):
             # Filter to closed orders since open orders can have no line items
             .filter(lambda x: x['state'] == u'locked')
             # Convert to lists of (line item id, order id) pairs
-            .flat_map(lambda x: x['lineItems']['elements'])
+            .flat_map(lambda x: x.get('lineItems', {'elements':[]})['elements'])
             .map(lambda x: {
                 'line_item_id': x['id'],
                 'order_id': x['orderRef']['id']
